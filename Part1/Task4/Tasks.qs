@@ -1,6 +1,9 @@
 namespace QCHack.Task4 {
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Intrinsic;
+    open Microsoft.Quantum.Arrays;
+    open Microsoft.Quantum.Logical;
+    open Microsoft.Quantum.Math;
 
     // Task 4 (12 points). f(x) = 1 if the graph edge coloring is triangle-free
     // 
@@ -43,7 +46,59 @@ namespace QCHack.Task4 {
         colorsRegister : Qubit[], 
         target : Qubit
     ) : Unit is Adj+Ctl {
-        // ...
+        
+        let e = Length(edges);
+        if (e < 3 or V < 3) {
+            X(target);
+        }
+        else {
+            let (triangles,num_triangles) = allTriangles(edges,V);
+            if (num_triangles == 0) {
+                X(target);
+            }
+            else {
+                use ancillae = Qubit[num_triangles];
+                within {
+                    for i in 0..num_triangles-1 {
+                        let (a,b,c) = triangles[i];
+                        let control = [colorsRegister[a],colorsRegister[b],colorsRegister[c]];
+                        (ControlledOnBitString([true,true,true], X))(control, ancillae[i]);
+                        (ControlledOnBitString([false,false,false], X))(control, ancillae[i]);
+                        X(ancillae[i]);
+                    }
+                }
+                apply {
+                    Controlled X(ancillae,target);
+                }
+            }
+        }
+    }
+
+    function allTriangles (edges: (Int,Int)[], V: Int) : ((Int,Int,Int)[],Int) {
+        //O(n^3) search because I'm a lazy programmer
+        let e = Length(edges);
+        let max_triangles = (V*(V-1))/2;
+        mutable num_triangles = 0;
+        mutable triangles = new(Int,Int,Int)[max_triangles];
+        for i in 0..e-1 {
+            for j in i+1..e-1 {
+                for k in j+1..e-1 {
+                    if isTriangle(edges[i],edges[j],edges[k]) {
+                        set triangles w/= num_triangles <- (i,j,k);
+                        set num_triangles += 1;
+                    }
+                }
+            }
+        }
+        return (triangles,num_triangles);
+    }
+
+    function isTriangle (e1: (Int, Int), e2: (Int, Int), e3: (Int, Int)) : Bool{
+        let (s1,f1) = e1;
+        let (s2,f2) = e2;
+        let (s3,f3) = e3;
+        let u = Unique(EqualI,Sorted(LessThanOrEqualI,[s1,f1,s2,f2,s3,f3]));
+        return (Length(u) == 3); 
     }
 }
 
