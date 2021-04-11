@@ -1,3 +1,26 @@
+# Welcome to Microsoft Challenge at QCHack 2021!
+## Part 1
+
+**CheckList**
+
+Submitted all tasks with all test cases executed.
+
+## Part 2 - Free Form
+
+**Problem Description**
+
+
+**Development**
+
+
+**Log**
+[11/04/21 ]: Created this commit to solve and advocate the usages of Grover's algorithm to enhance the *Quantum Computing* experience.
+
+
+
+
+
+
 # Welcome to Microsoft challenge at QCHack 2021!
 
 We are excited to offer this challenge to [QCHack 2021](https://www.qchack.io/) participants, and we are looking forward to the solutions you will come up with!
